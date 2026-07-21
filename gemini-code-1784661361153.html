@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusDoc Studio | Modern Visual Document Automation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        darkbg: '#0b0f17',
+                        darkcard: '#151c28',
+                        darkborder: '#222d3d'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- pdf-lib & pdfjs-dist -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50 dark:bg-darkbg text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-gray-200 dark:border-darkborder bg-white/80 dark:bg-darkcard/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i data-lucide="layers" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
+                        NexusDoc <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20 font-semibold">Studio v2.5</span>
+                    </h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Visual Workspace & Document Automation</p>
+                </div>
+            </div>
+
+            <!-- Workspace Mode Selector -->
+            <div class="hidden md:flex bg-gray-100 dark:bg-darkbg p-1 rounded-xl border border-gray-200 dark:border-darkborder">
+                <button id="tabQuickBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white dark:bg-darkcard text-brand-600 dark:text-brand-400 shadow-sm flex items-center gap-2 transition">
+                    <i data-lucide="zap" class="w-3.5 h-3.5"></i> Quick Studio
+                </button>
+                <button id="tabPipelineBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex items-center gap-2 transition">
+                    <i data-lucide="git-merge" class="w-3.5 h-3.5"></i> Visual Canvas
+                </button>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center space-x-3">
+                <button id="themeToggleBtn" class="p-2 rounded-xl bg-gray-100 dark:bg-darkbg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-darkborder transition" title="Toggle Theme">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+                <a href="https://github.com" target="_blank" class="hidden sm:flex px-3.5 py-2 text-xs font-medium rounded-xl bg-gray-900 text-white dark:bg-white dark:text-gray-900 hover:opacity-90 transition items-center gap-2">
+                    <i data-lucide="github" class="w-4 h-4"></i> GitHub Repos
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Studio Body -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col">
+        
+        <!-- ================= MODE 1: QUICK STUDIO ================= -->
+        <div id="quickStudioView" class="space-y-6">
+            
+            <!-- Hero Upload Section -->
+            <div id="dropzone" class="relative group border-2 border-dashed border-gray-300 dark:border-darkborder hover:border-brand-500 dark:hover:border-brand-500 rounded-2xl p-10 text-center bg-white dark:bg-darkcard transition-all duration-300 cursor-pointer shadow-sm hover:shadow-xl hover:shadow-brand-500/5">
+                <input type="file" id="fileInput" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.webp" multiple>
+                
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center transition-transform group-hover:scale-110">
+                    <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">Drop documents here to process</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 max-w-md mx-auto">Supports PDFs, Images (JPG, PNG, WEBP). 100% processed locally in your browser memory.</p>
+
+                <div class="flex items-center justify-center gap-3">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Zero Upload Privacy
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20 flex items-center gap-1.5">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Multi-Page Editing
+                    </span>
+                </div>
+            </div>
+
+            <!-- Interactive Workspace (Hidden until file selected) -->
+            <div id="workspaceArea" class="hidden space-y-6">
+                <!-- Toolbar Header -->
+                <div class="bg-white dark:bg-darkcard p-4 rounded-2xl border border-gray-200 dark:border-darkborder shadow-sm flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 rounded-xl bg-indigo-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 id="activeFileName" class="font-bold text-gray-900 dark:text-white text-sm">document.pdf</h4>
+                            <p id="activeFileSize" class="text-xs text-gray-500 dark:text-gray-400">Original Size: 0 MB</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Tools Bar -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button id="btnCompressMode" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 hover:bg-brand-100 transition flex items-center gap-1.5">
+                            <i data-lucide="minimize-2" class="w-3.5 h-3.5"></i> Compress Quality
+                        </button>
+                        <button id="btnWatermarkMode" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-gray-100 dark:bg-darkbg text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition flex items-center gap-1.5">
+                            <i data-lucide="stamp" class="w-3.5 h-3.5"></i> Add Watermark
+                        </button>
+                        <button id="btnRotateAll" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-gray-100 dark:bg-darkbg text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition flex items-center gap-1.5">
+                            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Rotate 90°
+                        </button>
+                        <button id="btnClearFile" class="px-3 py-2 text-xs font-semibold rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Controls & Compression Config Panel -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Left: Control Sliders & Options -->
+                    <div class="bg-white dark:bg-darkcard p-6 rounded-2xl border border-gray-200 dark:border-darkborder space-y-6">
+                        <h4 class="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-brand-500"></i> Processing Options
+                        </h4>
+
+                        <!-- Quality Slider -->
+                        <div>
+                            <div class="flex justify-between text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span>Compression Ratio</span>
+                                <span id="qualityLabel" class="text-brand-600 font-bold">75%</span>
+                            </div>
+                            <input type="range" id="qualitySlider" min="10" max="95" value="75" class="w-full h-2 bg-gray-200 dark:bg-darkborder rounded-lg appearance-none cursor-pointer accent-brand-600">
+                            <p class="text-[11px] text-gray-400 mt-1">Lower quality reduces file size significantly.</p>
+                        </div>
+
+                        <!-- Watermark Input -->
+                        <div id="watermarkBox">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Watermark Text</label>
+                            <input type="text" id="watermarkInput" placeholder="CONFIDENTIAL" class="w-full px-3.5 py-2 text-xs rounded-xl bg-gray-50 dark:bg-darkbg border border-gray-200 dark:border-darkborder text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        </div>
+
+                        <!-- Action Button -->
+                        <button id="btnProcessNow" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2">
+                            <i data-lucide="cpu" class="w-4 h-4"></i> Export Optimized Document
+                        </button>
+                    </div>
+
+                    <!-- Right: Visual Page Grid Studio -->
+                    <div class="md:col-span-2 bg-white dark:bg-darkcard p-6 rounded-2xl border border-gray-200 dark:border-darkborder">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+                                <i data-lucide="layout-grid" class="w-4 h-4 text-brand-500"></i> Document Page Studio
+                            </h4>
+                            <span id="pageCountBadge" class="text-xs bg-gray-100 dark:bg-darkbg text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-lg">0 Pages</span>
+                        </div>
+
+                        <!-- Thumbnail Grid -->
+                        <div id="pageGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[380px] overflow-y-auto p-1 custom-scrollbar">
+                            <!-- Page Previews appended dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result & Stats Banner (Hidden by default) -->
+                <div id="resultBanner" class="hidden bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 text-center space-y-4">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                        <i data-lucide="check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-emerald-600 dark:text-emerald-400">Processing Complete!</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Saved <span id="spaceSavedLabel" class="font-bold text-emerald-600 dark:text-emerald-400">0 MB</span> of digital bandwidth.</p>
+                    </div>
+                    <div class="flex justify-center gap-3">
+                        <a id="downloadResultLink" href="#" download class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition flex items-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i> Download Final Document
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= MODE 2: VISUAL CANVAS WORKSPACE ================= -->
+        <div id="pipelineStudioView" class="hidden flex-grow flex flex-col space-y-4">
+            <!-- Canvas Toolbar -->
+            <div class="bg-white dark:bg-darkcard p-3 rounded-2xl border border-gray-200 dark:border-darkborder flex flex-wrap justify-between items-center gap-4 shadow-sm">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Node Palette:</span>
+                    <button class="add-node-btn px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-darkbg text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition flex items-center gap-1.5" data-type="input">
+                        <i data-lucide="file-input" class="w-3.5 h-3.5 text-blue-500"></i> PDF Input
+                    </button>
+                    <button class="add-node-btn px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-darkbg text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition flex items-center gap-1.5" data-type="compress">
+                        <i data-lucide="minimize" class="w-3.5 h-3.5 text-indigo-500"></i> Compressor
+                    </button>
+                    <button class="add-node-btn px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-darkbg text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition flex items-center gap-1.5" data-type="redact">
+                        <i data-lucide="eye-off" class="w-3.5 h-3.5 text-red-500"></i> AI Redact
+                    </button>
+                    <button class="add-node-btn px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-darkbg text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition flex items-center gap-1.5" data-type="export">
+                        <i data-lucide="file-output" class="w-3.5 h-3.5 text-emerald-500"></i> Export Output
+                    </button>
+                </div>
+
+                <button id="runPipelineBtn" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center gap-2">
+                    <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Run Pipeline
+                </button>
+            </div>
+
+            <!-- Canvas Workspace -->
+            <div id="canvasArea" class="relative flex-grow bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder rounded-2xl min-h-[480px] overflow-hidden p-6 grid-bg">
+                <div class="absolute bottom-4 left-4 bg-white/90 dark:bg-darkcard/90 backdrop-blur px-3 py-1.5 rounded-xl border border-gray-200 dark:border-darkborder text-[11px] text-gray-500 flex items-center gap-2">
+                    <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i> Click nodes to drag & connect automation steps.
+                </div>
+
+                <!-- Canvas Nodes Holder -->
+                <div id="nodeHolder" class="relative w-full h-full min-h-[400px]">
+                    <!-- Sample Preset Nodes initialized via JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 dark:border-darkborder bg-white dark:bg-darkcard py-4 mt-6">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <p>&copy; 2026 NexusDoc Studio. Open Source Client-Side Platform.</p>
+            <div class="flex items-center space-x-4">
+                <span class="flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-500"></i> Client-Side Processing</span>
+                <span class="flex items-center gap-1"><i data-lucide="code" class="w-3.5 h-3.5 text-brand-500"></i> MIT License</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+/* Custom Scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.4);
+    border-radius: 4px;
+}
+
+/* Grid Background for Canvas */
+.grid-bg {
+    background-image: radial-gradient(rgba(156, 163, 175, 0.2) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Canvas Node Styling */
+.canvas-node {
+    position: absolute;
+    width: 220px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    cursor: move;
+    user-select: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dark .canvas-node {
+    background: #151c28;
+    border-color: #222d3d;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.canvas-node:hover {
+    border-color: #6366f1;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.15);
+}
